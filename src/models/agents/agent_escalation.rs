@@ -119,7 +119,9 @@ impl AgentFunctionTrait for AgentEscalation {
         if support_case.needs_upper_management_attention && support_case.escalated {
           CLIPrint::Info.out(&self.common.role, "Upper management will be with you shortly");
         } else {
-          CLIPrint::Default.out(&self.common.role, format!("Time for: {}", support_case.support_response.as_ref().unwrap()).as_str());
+          CLIPrint::Info.out(&self.common.role, format!("Possible actions to choose from: {}", self.potential_resolving_actions.as_ref().unwrap()).as_str());
+
+          CLIPrint::Default.out(&self.common.role, format!("{}", support_case.support_response.as_ref().unwrap()).as_str());
         }
 
         Ok(())
