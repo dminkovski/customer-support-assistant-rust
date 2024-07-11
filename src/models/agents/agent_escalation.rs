@@ -35,7 +35,7 @@ impl AgentEscalation {
             "Escalation Manager".to_string(),
             "You are an Escalation Manager helping with Customer Support. 
             You handle incoming customer queries and sentiments and decide which of the resolving actions you are provided with to call.
-            If you are not sure or believe a representative of upper management should get involved, you will answer with 'upper management'.
+            If you are not sure or believe a representative of upper management should get involved because the customer really feels upset, you will answer with 'upper management'.
             IMPORTANT: You do not ask any follow up questions. No questions at all. You decide on ONE of the provided actions OR 'upper management'.
             VERY IMPORTANT: You provide absolutely NO additional info or reasoning.".to_string(),
         );
@@ -90,7 +90,7 @@ impl AgentEscalation {
 #[async_trait]
 impl AgentFunctionTrait for AgentEscalation {
     async fn execute(&mut self, support_case: &mut SupportCase) -> Result<(), Box<dyn Error>> {
-        while self.common.state != AgentState::Finished {
+        while self.common.state != AgentState::Finished && support_case.should_escalate == true {
             match self.common.state {
                 AgentState::Waiting => {
                     CLIPrint::Info.out(&self.common.role, "Preparing action items...");
@@ -117,11 +117,14 @@ impl AgentFunctionTrait for AgentEscalation {
             }
         }
         if support_case.needs_upper_management_attention && support_case.escalated {
-          CLIPrint::Info.out(&self.common.role, "Upper management will be with you shortly");
-        } else {
+          CLIPrint::Warning.out(&self.common.role, "Upper management will be with you shortly.");
+          // Do something for Upper Management.
+        } else if support_case.should_escalate {
           CLIPrint::Info.out(&self.common.role, format!("Possible actions to choose from: {}", self.potential_resolving_actions.as_ref().unwrap()).as_str());
 
-          CLIPrint::Default.out(&self.common.role, format!("{}", support_case.support_response.as_ref().unwrap()).as_str());
+          CLIPrint::Default.out(&self.common.role, format!("{}", support_case.support_response.as_ref().unwrap_or(&"".to_string())).as_str());
+          
+          // Create a ticket with action steps.
         }
 
         Ok(())
