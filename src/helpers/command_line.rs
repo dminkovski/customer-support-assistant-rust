@@ -26,7 +26,7 @@ impl CLIPrint {
             Self::Default => "",
         };
         stdout.execute(SetForegroundColor(Color::Blue));
-        print!("{}: ", role);
+        print!("|{}|", role);
         stdout.execute(SetForegroundColor(color));
         print!("{}", prefix);
         stdout.execute(ResetColor).unwrap();

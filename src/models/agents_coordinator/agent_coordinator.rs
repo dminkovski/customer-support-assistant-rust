@@ -7,7 +7,6 @@ use crate::models::agents_common::{
 use crate::models::general::support_case::SupportCase;
 
 pub struct CoordinatorAgent {
-    common: CommonAgent,
     support_case: SupportCase,
     agents: Vec<Box<dyn AgentFunctionTrait>>,
 }
@@ -15,14 +14,9 @@ pub struct CoordinatorAgent {
 impl CoordinatorAgent {
     pub fn new(context: String, query: String) -> Self {
         let support_case = SupportCase::new(context, query);
-        let common: CommonAgent = CommonAgent::new(
-            "Support Coordinator".to_string(),
-            "You are an agent coordinator.".to_string(),
-        );
-
+    
         Self {
             support_case,
-            common,
             agents: vec![],
         }
     }

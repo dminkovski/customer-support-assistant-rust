@@ -37,14 +37,12 @@ impl AgentSentiment {
             support_case.sentiment = Some(response.clone());
             match response.as_str() {
                 "Positive" => {
-                    // Thanks
                     CLIPrint::Info.out(
                         &self.common.role,
                         "Sentiment is 'Positive'",
                     );
                 }
                 "Negative" => {
-                    // Escalate
                     CLIPrint::Warning.out(&self.common.role, "Sentiment is 'Negative'");
                     support_case.should_escalate = true;
                 }

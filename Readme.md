@@ -53,12 +53,16 @@ The `SupportCase` struct is used to log information and maintain a complete hist
 
 ```rust
 struct SupportCase {
-    case_id: Uuid,
-    customer_query: String,
-    responses: Vec<AgentResponse>,
-    sentiment: Option<String>,
-    escalated: bool,
-    created_at: DateTime<Utc>,
-    updated_at: DateTime<Utc>,
+    pub case_id: Uuid,
+    pub support_context: String,
+    pub customer_query: String,
+    pub support_response: Option<String>,
+    pub sentiment: Option<String>,
+    pub should_escalate: bool,
+    pub escalated: bool,
+    pub needs_upper_management_attention: bool,
+    pub created_at: DateTime<Local>,
+    pub updated_at: DateTime<Local>,
+    pub trace: Vec<Message>
 }
 ```
