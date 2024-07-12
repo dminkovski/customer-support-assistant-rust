@@ -6,27 +6,27 @@ use crate::helpers::request::{ai_request, prepare_message};
 use crate::models::agents_common::common_agent::{AgentState, CommonAgent};
 use crate::models::agents_common::common_traits::{AgentFunctionTrait, CommonTrait};
 use crate::models::ai::chatgpt::Message;
-use crate::models::general::support_case::{self, SupportCase};
+use crate::models::general::support_case::{ SupportCase };
 use std::error::Error;
 
 #[derive(Debug)]
 pub struct AgentEscalation {
     pub common: CommonAgent,
-    pub potential_resolving_actions: Option<String>
 }
 
-const ACTIONS_PROMPT: &str = "You are in charge of customer escalations within Customer Support. 
+const ACTIONS_PROMPT: &str = r#"You are in charge of customer escalations within Customer Support. 
             You handle incoming customer queries and sentiments and provide resolving actions.
             You will respond with a JSON Format of an Array of ACTIONS to call in different customer support scenarios based on context.
             IMPORTANT: You do not ask any follow up questions. No questions at all.
+            SUPER IMPORTANT: Remove any '```json' or weird formats. It needs to a VALID JSON array only.
             EXAMPLE 1:
             Input: 5 Stars Hotel
-            Output: ['Change room','Provide discount for bar and snacks','Call mechanic','Call room service']
+            Output: ["Change room","Provide discount for bar and snacks","Call mechanic","Call room service"]
 
             EXAMPLE 2:
             Input: Small, medium sized Company
-            Output: ['Setup meeting with HR','Setup meeting with Sales','Refund item','Offer discount']
-            ";
+            Output: ["Setup meeting with HR","Setup meeting with Sales","Refund item","Offer discount"]
+            "#;
 
 
 impl AgentEscalation {
@@ -39,7 +39,7 @@ impl AgentEscalation {
             IMPORTANT: You do not ask any follow up questions. No questions at all. You decide on ONE of the provided actions OR 'upper management'.
             VERY IMPORTANT: You provide absolutely NO additional info or reasoning.".to_string(),
         );
-        Self { common, potential_resolving_actions: None }
+        Self { common }
     }
 
     async fn populate_resolving_actions(&mut self, support_case: &mut SupportCase){
@@ -50,7 +50,9 @@ impl AgentEscalation {
         support_case.trace.push(msg.clone());
         let result: Result<String, Box<dyn Error + Send>> = ai_request(msg).await;
         if let Ok(action) = result {
-          self.potential_resolving_actions = Some(action);
+          dbg!(&action);
+          let actions:Vec<String> = serde_json::from_str(&action).expect("should be parsed into json");
+          support_case.supported_actions = actions;
           self.common.state = AgentState::Working;
         } else {
           self.common.state = AgentState::Error;
@@ -61,7 +63,7 @@ impl AgentEscalation {
         self.common.update_state(AgentState::Working);
         let query: &str = &support_case.customer_query;
         let msg: Message =
-            prepare_message(format!("{} ONLY AVAILABLE ACTIONS:{}",&self.common.objective, &self.potential_resolving_actions.as_ref().unwrap()).as_str(), &support_case.support_context, query);
+            prepare_message(format!("{} ONLY AVAILABLE ACTIONS:{}",&self.common.objective, &support_case.supported_actions.join(",")).as_str(), &support_case.support_context, query);
         support_case.trace.push(msg.clone());
         let result: Result<String, Box<dyn Error + Send>> = ai_request(msg).await;
         match result {
@@ -120,7 +122,7 @@ impl AgentFunctionTrait for AgentEscalation {
           CLIPrint::Warning.out(&self.common.role, "Upper management will be with you shortly.");
           // Do something for Upper Management.
         } else if support_case.should_escalate {
-          CLIPrint::Info.out(&self.common.role, format!("Possible actions to choose from: {}", self.potential_resolving_actions.as_ref().unwrap()).as_str());
+          CLIPrint::Info.out(&self.common.role, format!("Possible actions to choose from: {}", support_case.supported_actions.join(",")).as_str());
 
           CLIPrint::Default.out(&self.common.role, format!("{}", support_case.support_response.as_ref().unwrap_or(&"".to_string())).as_str());
           

@@ -52,3 +52,45 @@ pub fn get_user_response(question: &str) -> String {
     // Trim whitespace and return
     return user_response.trim().to_string();
 }
+
+
+// Get user response that code is safe to execute
+pub fn confirm_safe_code() -> bool {
+    let mut stdout: std::io::Stdout = stdout();
+    loop {
+        // Print question in specified color
+        stdout.execute(SetForegroundColor(Color::Blue)).unwrap();
+        println!("");
+        print!("WARNING: You are about to run code written entirely by AI.");
+        println!("Review your code and confirm you wish to continue.");
+
+        // Reset Color
+        stdout.execute(ResetColor).unwrap();
+
+        // Present options with diff. colors
+        stdout.execute(SetForegroundColor(Color::Green)).unwrap();
+        println!("[1] All good. Let's go!");
+        stdout.execute(SetForegroundColor(Color::Red)).unwrap();
+        println!("[2] Stop this madness!");
+
+        let mut response: String = String::new();
+        stdin()
+            .read_line(&mut response)
+            .expect("Failed to read human input");
+
+        let response = response.trim().to_lowercase();
+
+        match response.as_str() {
+            "1" | "ok" | "y" | "yes" => {
+                return true;
+            }
+            "2" | "n" | "no" => {
+                return false;
+            }
+            _ => {
+                println!("Invalid input.");
+                return false;
+            }
+        }
+    }
+}

@@ -1,3 +1,4 @@
+use crate::models::agents::agent_backend::AgentBackendDeveloper;
 use crate::models::agents::agent_escalation::AgentEscalation;
 use crate::models::agents::{agent_query::AgentCustomerQuery, agent_sentiment::AgentSentiment};
 use crate::models::agents_common::{
@@ -27,6 +28,7 @@ impl CoordinatorAgent {
         self.add_agent(Box::new(AgentCustomerQuery::new()));
         self.add_agent(Box::new(AgentSentiment::new()));
         self.add_agent(Box::new(AgentEscalation::new()));
+        self.add_agent(Box::new(AgentBackendDeveloper::new()));
     }
     pub async fn handle_support_request(&mut self) {
         self.create_agents();

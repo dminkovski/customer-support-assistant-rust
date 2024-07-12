@@ -6,6 +6,7 @@ use super::common_traits::CommonTrait;
 pub enum AgentState {
     Waiting,
     Working,
+    Testing,
     Error,
     Finished,
 }

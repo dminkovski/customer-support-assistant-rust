@@ -16,6 +16,7 @@ pub struct SupportCase {
     pub created_at: DateTime<Local>,
     pub updated_at: DateTime<Local>,
     pub trace: Vec<Message>,
+    pub supported_actions: Vec<String>
 }
 
 impl SupportCase {
@@ -32,6 +33,7 @@ impl SupportCase {
             created_at: Local::now(),
             updated_at: Local::now(),
             trace: Vec::from([]),
+            supported_actions: Vec::from([])
         }
     }
     pub fn updated(&mut self) {

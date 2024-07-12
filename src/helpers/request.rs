@@ -4,7 +4,7 @@ use crate::{
     api::gpt_request::call_gpt,
     models::{
         ai::chatgpt::Message,
-        general::support_case::{self, SupportCase},
+        general::support_case::{ SupportCase},
     },
 };
 
