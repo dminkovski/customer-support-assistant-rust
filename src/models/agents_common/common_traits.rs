@@ -21,4 +21,7 @@ pub trait AgentFunctionTrait: Debug {
 
     // Coordinator can get common information from agent
     fn get_common_from_agent(&self) -> &CommonAgent;
+
+    // Sets the assistant ID that was created from Azure OpenAI
+    fn set_assistant_id(&mut self, id: String);
 }

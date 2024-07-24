@@ -28,8 +28,6 @@ pub fn extend_ai_function(ai_func: fn(&str) -> &'static str, func_input: &str) -
     }
 }
 
-
-
 // Check whether request URL is valid
 pub async fn check_status_code(client: &Client, url: &str) -> Result<u16, reqwest::Error> {
     let response = client.get(url).send().await?;

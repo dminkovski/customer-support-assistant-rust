@@ -2,10 +2,7 @@ use std::error::Error;
 
 use crate::{
     api::gpt_request::call_gpt,
-    models::{
-        ai::chatgpt::Message,
-        general::support_case::{ SupportCase},
-    },
+    models::{ai::chatgpt::Message, general::support_case::SupportCase},
 };
 
 pub fn prepare_message(objective: &str, context: &str, query: &str) -> Message {

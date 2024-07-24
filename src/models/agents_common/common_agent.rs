@@ -16,6 +16,8 @@ pub struct CommonAgent {
     pub role: String,
     pub objective: String,
     pub state: AgentState,
+    pub assistant_id: Option<String>,
+    pub thread_id: Option<String>,
     pub memory: Vec<Message>,
 }
 
@@ -25,6 +27,8 @@ impl CommonTrait for CommonAgent {
             role,
             objective,
             state: AgentState::Waiting,
+            assistant_id: None,
+            thread_id: None,
             memory: Vec::from([]),
         }
     }
